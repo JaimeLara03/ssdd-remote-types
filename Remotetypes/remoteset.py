@@ -3,9 +3,9 @@
 from typing import Optional
 
 import Ice
-import RemoteTypes as rt  # noqa: F401; pylint: disable=import-error
+import Remotetypes as rt  # noqa: F401; pylint: disable=import-error
 
-from remotetypes.customset import StringSet
+from Remotetypes.customset import StringSet
 
 
 class RemoteSet(rt.RSet):
