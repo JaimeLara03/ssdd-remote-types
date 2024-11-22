@@ -3,7 +3,7 @@
 from typing import Optional
 
 import Ice
-import remotetypes as rt  # noqa: F401; pylint: disable=import-error
+import RemoteTypes as rt  # noqa: F401; pylint: disable=import-error
 
 from remotetypes.customset import StringSet
 

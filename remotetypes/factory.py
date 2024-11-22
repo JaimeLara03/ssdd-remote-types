@@ -1,13 +1,13 @@
 """Needed classes to implement the Factory interface."""
 
-import remotetypes.remotetypes_ice as rt
+import RemoteTypes as rt
 from remotetypes.remotedict import RemoteDict
 from remotetypes.remotelist import RemoteList
 from remotetypes.remoteset import RemoteSet
-from remotetypes.remotetypes_ice import TypeName, RTypePrx
+from RemoteTypes import TypeName, RTypePrx
 
 
-class Factory(rt.RDict):
+class Factory(rt.Factory):
     """Skeleton for the Factory implementation."""
 
     def __init__(self):

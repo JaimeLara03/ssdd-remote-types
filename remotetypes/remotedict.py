@@ -3,7 +3,7 @@
 import RemoteTypes as rt  # noqa: F401; pylint: disable=import-error
 
 
-class RemoteDict(rt.remotetypes_ice.RDict):
+class RemoteDict(rt.RDict):
     """Implementation of the RDict type."""
 
     def __init__(self):
