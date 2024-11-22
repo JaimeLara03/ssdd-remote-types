@@ -5,7 +5,13 @@ import os
 import Ice
 
 try:
-    import RemoteTypes  # noqa: F401
+    slice_path = os.path.join(
+        os.path.dirname(__file__),
+        "remotetypes.ice",
+    )
+
+    Ice.loadSlice(slice_path)
+    import remotetypes # noqa: F401
 
 except ImportError:
     slice_path = os.path.join(
@@ -14,4 +20,4 @@ except ImportError:
     )
 
     Ice.loadSlice(slice_path)
-    import RemoteTypes  # noqa: F401
+    import remotetypes  # noqa: F401
