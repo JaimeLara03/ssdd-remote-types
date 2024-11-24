@@ -10,7 +10,7 @@ class Client(Ice.Application):
     def run(self, argv: List[str]) -> int:
         try:
             # Recibir el proxy del servidor desde la línea de comandos
-            proxy = self.communicator().stringToProxy(argv[1])
+            proxy = self.communicator().stringToProxy("factory:default -p 10000")
         except IndexError:
             logging.error('¡Se requiere un proxy como argumento!')
             return -1
