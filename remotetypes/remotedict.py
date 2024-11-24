@@ -60,7 +60,7 @@ class RemoteDict(rt.RDict):
 
     def iter(self, current: Optional[Ice.Current] = None) -> rt.IterablePrx:
         hash_cache = hash(tuple(self._data.items()))  # Asegúrate de usar items() si necesitas pares clave-valor
-        iterable = Iterable(list(self._data.items()), hash_cache)  # Pares clave-valor
+        iterable = Iterable(list(self._data.keys()), hash_cache)  # Solo claves si es necesario
         proxy = current.adapter.addWithUUID(iterable)
         return rt.IterablePrx.uncheckedCast(proxy)
 
