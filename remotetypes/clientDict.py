@@ -4,7 +4,7 @@ from typing import List
 import Ice
 import RemoteTypes as rt
 
-CHUNK_SIZE = 1024  # No se necesita en este caso, pero lo dejamos por consistencia con tu ejemplo.
+from remotetypes.iterable import CancelIteration, StopIteration
 
 class Client(Ice.Application):
     def run(self, argv: List[str]) -> int:
@@ -15,7 +15,6 @@ class Client(Ice.Application):
             logging.error('¡Se requiere un proxy como argumento!')
             return -1
 
-        
         # Convertir el proxy en un FactoryPrx
         factory = rt.FactoryPrx.checkedCast(proxy)
         if not factory:
@@ -35,19 +34,35 @@ class Client(Ice.Application):
         print("Diccionario remoto obtenido.")
 
         # Operaciones con el diccionario remoto
-        print("Añadiendo clave1 -> valor1 al diccionario remoto.")
-        rdict.setItem("clave1", "valor1")
+        try:
+            # 1. setItem
+            print("Añadiendo clave1 -> valor1 al diccionario remoto.")
+            rdict.setItem("clave1", "valor1")
 
-        print("Recuperando valor para clave1.")
-        valor = rdict.getItem("clave1")
-        print(f"Valor recuperado: {valor}")
+            print("Añadiendo clave2 -> valor2 al diccionario remoto.")
+            rdict.setItem("clave2", "valor2")
 
-        print("Eliminando clave1 del diccionario remoto.")
-        eliminado = rdict.pop("clave1")
-        print(f"Elemento eliminado: {eliminado}")
+            # 8. iter
+            print("Iterando sobre el diccionario remoto.")
+            try:
+                iterator = rdict.iter()
+                while True:
+                    key, value = iterator.next()
+                    print(f"Clave: {key}, Valor: {value}")
+            except StopIteration:
+                print("Iteración completada (final del diccionario alcanzado).")
+            except CancelIteration:
+                print("Iteración cancelada debido a modificaciones en el diccionario.")
+            except Exception as e:
+                print(f"Error inesperado durante la iteración: {e}")
 
-        print("Operaciones completadas exitosamente.")
+        except Exception as e:
+            logging.error(f"Error durante las operaciones: {e}")
+            return -1
+
+        print("Todas las operaciones completadas exitosamente.")
         return 0
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
