@@ -4,33 +4,47 @@ import RemoteTypes as rt
 from remotetypes.remotedict import RemoteDict
 from remotetypes.remotelist import RemoteList
 from remotetypes.remoteset import RemoteSet
-from RemoteTypes import TypeName, RTypePrx
 
+import logging
+
+import Ice
+from typing import Optional, Dict
 
 class Factory(rt.Factory):
     """Skeleton for the Factory implementation."""
 
-    def __init__(self):
-        """Initialize the Factory with an empty object registry."""
-        self._objects = {}  # Dictionary to store objects by their identifier
+    def __init__(self, adapter: Ice.ObjectAdapter) -> None:
+        """Initialise the Factory object."""
+        self.adapter = adapter  # Adaptador para publicar objetos
+        self.instances: Dict[str, Ice.Object] = {}  # Almacenar instancias registradas
 
-    def get(self, type_name, identifier=None):
-        """Create or retrieve a remote object."""
-        if identifier and identifier in self._objects:
-            return self._objects[identifier]  # Reuse existing object
+    def get(self, typeName: rt.TypeName, identifier: Optional[str] = None, current: Optional[Ice.Current] = None) -> rt.RType:
+        """Obtener un objeto remoto según el tipo solicitado."""
+        print("Empieza el get")
 
-        # Create a new object based on type_name
-        if type_name == TypeName.RDict:
-            new_object = RemoteDict()
-        elif type_name == TypeName.RList:
-            new_object = RemoteList()
-        elif type_name == TypeName.RSet:
-            new_object = RemoteSet()
+        # Si el objeto ya existe, devolver su proxy
+        if identifier and identifier in self.instances:
+            print(f"El objeto '{identifier}' ya existe, devolviendo proxy existente.")
+            return self.adapter.createProxy(self.communicator().stringToIdentity(identifier))
+
+        # Crear un nuevo objeto basado en el tipo solicitado
+        if typeName == rt.TypeName.RList:
+            instance = RemoteList(identifier)
+        elif typeName == rt.TypeName.RSet:
+            instance = RemoteSet(identifier)
+            print("Se creó el RemoteSet")
+        elif typeName == rt.TypeName.RDict:
+            instance = RemoteDict(identifier)
         else:
-            raise ValueError(f"Unknown type: {type_name}")
+            raise ValueError("Unknown type name")
 
-        # Store the object in the registry if identifier is provided
-        if identifier:
-            self._objects[identifier] = new_object
+        # Registrar el objeto en el adaptador con una identidad única
+        identity = Ice.Identity(name=identifier, category="")
+        current.adapter.add(instance, identity)
+        self.instances[identifier] = instance  # Almacenar la instancia localmente
 
-        return new_object
+        # Generar el proxy remoto y devolverlo
+        proxy = current.adapter.createProxy(identity)
+        print(f"Proxy generado: {proxy}.")
+        
+        return rt.RTypePrx.checkedCast(proxy)

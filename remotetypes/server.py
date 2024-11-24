@@ -20,8 +20,8 @@ class Server(Ice.Application):
 
         It will initialise the needed middleware elements in order to execute the server.
         """
-        factory_servant = Factory()
         adapter = self.communicator().createObjectAdapter("remotetypes")
+        factory_servant = Factory(adapter)
         proxy = adapter.add(factory_servant, self.communicator().stringToIdentity("factory"))
         self.logger.info('Proxy: "%s"', proxy)
 
