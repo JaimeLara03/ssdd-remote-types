@@ -25,7 +25,8 @@ class Factory(rt.Factory):
         # Si el objeto ya existe, devolver su proxy
         if identifier and identifier in self.instances:
             print(f"El objeto '{identifier}' ya existe, devolviendo proxy existente.")
-            return self.adapter.createProxy(self.communicator().stringToIdentity(identifier))
+            identity = Ice.Identity(name=identifier, category="")
+            return rt.RTypePrx.checkedCast(current.adapter.createProxy(identity))
 
         # Crear un nuevo objeto basado en el tipo solicitado
         if typeName == rt.TypeName.RList:

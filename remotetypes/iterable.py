@@ -35,12 +35,18 @@ class Iterable(rt.Iterable):
 
     def next(self, current: Optional[Ice.Current] = None) -> str:
         """Obtiene el siguiente elemento en el iterador."""
-        if self._index >= len(self._data):  # Verifica si ya no hay más elementos
-            raise rt.StopIteration()  # Lanza la excepción esperada
+        # Verificar si el objeto iterado fue modificado
+        if self._hash_cache != hash(tuple(self._data)):
+            raise rt.CancelIteration()
+
+        # Verificar si ya no hay más elementos en la lista
+        if self._index >= len(self._data):
+            raise rt.StopIteration()
+
+        # Devolver el elemento actual y avanzar el índice
         element = self._data[self._index]
         self._index += 1
         return element
-
 
     def cancel(self, hash_cache: int, current: Optional[Ice.Current] = None) -> None:
         """Cancel the iteration if the object has been modified."""

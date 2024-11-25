@@ -22,20 +22,28 @@ class RemoteList(rt.RList):
 
     def iter(self, current: Optional[Ice.Current] = None) -> rt.Iterable:
         """Return a proxy to an iterator for the list."""
+        # Verificar si la lista está vacía
         if not self._data:
-            raise StopIteration("La lista está vacía, no se puede iterar.")
-        
-        # Crear un iterador basado en la lista
+            raise rt.StopIteration("La lista está vacía, no se puede iterar.")
+
+        # Crear un iterador basado en la lista actual
         iterator = Iterable(self._data, hash(tuple(self._data)))
-        
+
+        # Obtener el adaptador del servidor desde el contexto actual
         adapter = current.adapter
+        if not adapter:
+            raise RuntimeError("El adaptador no está disponible.")
+
         # Registrar el iterador en el adaptador de objetos
         proxy = adapter.addWithUUID(iterator)
+
+        # Registrar el proxy como un tipo específico de iterador
+        iterable_proxy = rt.IterablePrx.checkedCast(proxy)
+        if not iterable_proxy:
+            raise RuntimeError("No se pudo crear un proxy válido para el iterador.")
+
         print(f"Iterador creado para la lista con {len(self._data)} elementos.")
-        return proxy
-
-    # Resto de los métodos (append, remove, getItem, etc.) permanecen igual.
-
+        return iterable_proxy
 
     def remove(self, value: str, current: Optional[Ice.Current] = None) -> None:
         """Remove an element by value."""
