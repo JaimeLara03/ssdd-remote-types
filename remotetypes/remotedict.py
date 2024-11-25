@@ -2,7 +2,7 @@ import RemoteTypes as rt
 from typing import Optional
 import Ice
 
-from remotetypes.iterable import Iterable  # Importa la clase personalizada Iterable
+from remotetypes.iterable import IterableRDict  # Importa la clase personalizada Iterable
 
 class RemoteDict(rt.RDict):
     """Implementation of the RDict type."""
@@ -59,8 +59,30 @@ class RemoteDict(rt.RDict):
         return self._identifier
 
     def iter(self, current: Optional[Ice.Current] = None) -> rt.IterablePrx:
-        hash_cache = hash(tuple(self._data.items()))  # Asegúrate de usar items() si necesitas pares clave-valor
-        iterable = Iterable(list(self._data.keys()), hash_cache)  # Solo claves si es necesario
-        proxy = current.adapter.addWithUUID(iterable)
-        return rt.IterablePrx.uncheckedCast(proxy)
+        """
+        Devuelve un proxy para un iterador del diccionario.
+        """
+        if not self._data:
+            raise rt.StopIteration("El diccionario está vacío, no se puede iterar.")
+
+        # Crear un iterador basado en los pares clave-valor del diccionario
+        hash_cache = hash(frozenset(self._data.items()))
+        iterable = IterableRDict(self._data, hash_cache)
+
+        # Obtener el adaptador del servidor desde el contexto actual
+        adapter = current.adapter
+        if not adapter:
+            raise RuntimeError("El adaptador no está disponible.")
+
+        # Registrar el iterador en el adaptador de objetos
+        proxy = adapter.addWithUUID(iterable)
+
+        # Registrar el proxy como un tipo específico de iterador
+        iterable_proxy = rt.IterablePrx.checkedCast(proxy)
+        if not iterable_proxy:
+            raise RuntimeError("No se pudo crear un proxy válido para el iterador.")
+
+        print(f"Iterador creado para el diccionario con {len(self._data)} elementos.")
+        return iterable_proxy
+
 

@@ -4,7 +4,7 @@ import RemoteTypes as rt
 from typing import Optional
 import Ice, IcePy
 
-from remotetypes.iterable import Iterable  # Importa la clase personalizada Iterable
+from remotetypes.iterable import IterableRList  # Importa la clase personalizada Iterable
 
 class RemoteList(rt.RList):
     """Implementation of the RList type."""
@@ -27,7 +27,7 @@ class RemoteList(rt.RList):
             raise rt.StopIteration("La lista está vacía, no se puede iterar.")
 
         # Crear un iterador basado en la lista actual
-        iterator = Iterable(self._data, hash(tuple(self._data)))
+        iterator = IterableRList(self._data, hash(tuple(self._data)))
 
         # Obtener el adaptador del servidor desde el contexto actual
         adapter = current.adapter
