@@ -5,84 +5,74 @@ import Ice
 from remotetypes.iterable import IterableRDict  # Importa la clase personalizada Iterable
 
 class RemoteDict(rt.RDict):
-    """Implementation of the RDict type."""
+    """Implementación de la interfaz RDict."""
 
     def __init__(self, identifier: str):
-        """Initialize the dictionary with a unique identifier."""
+        """Inicializa el diccionario remoto con un identificador único."""
         super().__init__()
         self._identifier = identifier
         self._data = {}  # Diccionario interno para almacenar los datos
-        self._hash_cache = None  # Caché para el hash del diccionario
 
     def remove(self, key: str, current: Optional[Ice.Current] = None) -> None:
-        """Remove a key from the dictionary."""
+        """Elimina una clave del diccionario."""
         if key not in self._data:
-            raise KeyError(f"Key '{key}' not found.")
+            raise rt.KeyError(key=key)
         del self._data[key]
-        self._hash_cache = None  # Reset hash cache
 
     def length(self, current: Optional[Ice.Current] = None) -> int:
-        """Return the number of items in the dictionary."""
+        """Devuelve el número de elementos en el diccionario."""
         return len(self._data)
 
     def contains(self, key: str, current: Optional[Ice.Current] = None) -> bool:
-        """Check if the dictionary contains a specific key."""
+        """Verifica si el diccionario contiene una clave específica."""
         return key in self._data
 
     def hash(self, current: Optional[Ice.Current] = None) -> int:
-        """Return a hash value for the dictionary."""
-        if self._hash_cache is None:
-            self._hash_cache = hash(frozenset(self._data.items()))
-        return self._hash_cache
+        """Devuelve un valor hash para el diccionario."""
+        return hash(frozenset(self._data.items()))
 
     def setItem(self, key: str, value: str, current: Optional[Ice.Current] = None) -> None:
-        """Set a value for a specific key in the dictionary."""
+        """Establece un valor para una clave específica en el diccionario."""
         self._data[key] = value
-        self._hash_cache = None  # Reset hash cache
 
     def getItem(self, key: str, current: Optional[Ice.Current] = None) -> str:
-        """Get the value associated with a specific key."""
+        """Obtiene el valor asociado a una clave específica."""
         if key not in self._data:
-            raise KeyError(f"Key '{key}' not found.")
+            raise rt.KeyError(key=key)
         return self._data[key]
 
     def pop(self, key: str, current: Optional[Ice.Current] = None) -> str:
-        """Remove and return the value for a specific key."""
+        """Elimina y devuelve el valor para una clave específica."""
         if key not in self._data:
-            raise KeyError(f"Key '{key}' not found.")
-        value = self._data.pop(key)
-        self._hash_cache = None  # Reset hash cache
-        return value
+            raise rt.KeyError(key=key)
+        return self._data.pop(key)
 
-    def getIdentifier(self, current: Optional[Ice.Current] = None) -> str:
-        """Return the identifier of the RemoteDict."""
+    def identifier(self, current: Optional[Ice.Current] = None) -> str:
+        """Devuelve el identificador del RemoteDict."""
         return self._identifier
 
     def iter(self, current: Optional[Ice.Current] = None) -> rt.IterablePrx:
         """
         Devuelve un proxy para un iterador del diccionario.
         """
-        if not self._data:
-            raise rt.StopIteration()
-
-        # Crear un iterador basado en las claves del diccionario
-        hash_cache = hash(frozenset(self._data.items()))
-        iterable = IterableRDict(list(self._data.keys()), hash_cache)
-
-        # Obtener el adaptador del servidor desde el contexto actual
         adapter = current.adapter
         if not adapter:
             raise RuntimeError("El adaptador no está disponible.")
 
+        # Pasar una referencia al RemoteDict y su hash actual al iterador
+        iterable = IterableRDict(self)
+
         # Registrar el iterador en el adaptador de objetos
         proxy = adapter.addWithUUID(iterable)
 
-        # Registrar el proxy como un tipo específico de iterador
+        # Obtener el proxy como un objeto de tipo IterablePrx
         iterable_proxy = rt.IterablePrx.checkedCast(proxy)
         if not iterable_proxy:
             raise RuntimeError("No se pudo crear un proxy válido para el iterador.")
 
-        print(f"Iterador creado para el diccionario con {len(self._data)} claves.")
+        print(f"Iterador creado para el diccionario con {len(self._data)} elementos.")
         return iterable_proxy
+
+
 
 

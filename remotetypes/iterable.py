@@ -3,6 +3,7 @@
 import RemoteTypes as rt  # noqa: F401; pylint: disable=import-error
 import Ice
 from typing import List, Optional
+import builtins
 
 from RemoteTypes import StopIteration
 
@@ -10,86 +11,113 @@ from RemoteTypes import StopIteration
 # for the 3 needed types. It is valid to implement 3 different classes implementing
 # the same interface and use an object from different implementations when needed.
 
-class StopIteration(Ice.UserException):
-    """Exception raised when iteration is completed."""
-    pass
+import Ice
 
+class StopIteration(Ice.UserException):
+    def __init__(self, reason=""):
+        Ice.UserException.__init__(self)
+        self.reason = reason
+
+    def __str__(self):
+        return self.reason
 
 class CancelIteration(Ice.UserException):
-    """Exception raised when the iterable object is modified."""
-    pass
+    def __init__(self, reason=""):
+        Ice.UserException.__init__(self)
+        self.reason = reason
+
+    def __str__(self):
+        return self.reason
+
 
 
 class IterableRList(rt.Iterable):
     """Implementation for the Iterable interface."""
 
-    def __init__(self, data: List[str], hash_cache: int):
+    def __init__(self, remote_list):
         """
-        Initialize the Iterable object.
-        :param data: The data to iterate over.
-        :param hash_cache: Cached hash value of the data to detect modifications.
+        Inicializa el iterador de la lista remota.
+        :param remote_list: Referencia al objeto RemoteList original.
         """
-        self._data = data  # Datos del objeto iterado
-        self._index = 0  # Índice actual en la iteración
-        self._hash_cache = hash_cache  # Caché del hash inicial para detectar modificaciones
+        self._remote_list = remote_list  # Referencia al RemoteList original
+        self._hash_cache = remote_list.hash()  # Hash inicial de la lista
+        self._data = list(remote_list._data)  # Copia de los datos de la lista
+        self._index = 0  # Índice para iterar sobre los elementos
 
-    def next(self, current: Optional[Ice.Current] = None) -> str:
-        """Obtiene el siguiente elemento en el iterador."""
-        # Verificar si el objeto iterado fue modificado
-        if self._hash_cache != hash(tuple(self._data)):
+    def next(self, current=None):
+        """
+        Obtiene el siguiente elemento del iterador.
+        Lanza StopIteration si no hay más elementos.
+        Lanza CancelIteration si la lista fue modificada.
+        """
+        # Verificar si la lista fue modificada
+        current_hash = self._remote_list.hash()
+        if self._hash_cache != current_hash:
             raise rt.CancelIteration()
 
-        # Verificar si ya no hay más elementos en la lista
         if self._index >= len(self._data):
             raise rt.StopIteration()
 
-        # Devolver el elemento actual y avanzar el índice
-        element = self._data[self._index]
+        item = self._data[self._index]
         self._index += 1
-        return element
-
-    def cancel(self, hash_cache: int, current: Optional[Ice.Current] = None) -> None:
-        """Cancel the iteration if the object has been modified."""
-        if hash_cache != self._hash_cache:
-            raise CancelIteration()
-        
+        return item
+    
 class IterableRDict(rt.Iterable):
-    """Iterador para RemoteDict."""
+    def __init__(self, remote_dict):
+        """
+        Inicializa el iterador del diccionario remoto.
+        :param remote_dict: Referencia al objeto RemoteDict original.
+        """
+        self._remote_dict = remote_dict  # Referencia al RemoteDict original
+        self._hash_cache = remote_dict.hash()  # Hash inicial del diccionario
+        self._keys = list(remote_dict._data.keys())  # Capturar las claves actuales del diccionario
+        self._index = 0  # Índice para iterar sobre las claves
 
-    def __init__(self, data: list, hash_cache: int):
+    def next(self, current: Optional[Ice.Current] = None):
         """
-        Inicializar el iterador del diccionario remoto.
-        :param data: Lista de claves del diccionario.
-        :param hash_cache: Caché de hash inicial para detectar modificaciones.
+        Obtiene el siguiente elemento del iterador.
+        Lanza StopIteration si no hay más elementos.
+        Lanza CancelIteration si el diccionario fue modificado.
         """
-        if not isinstance(data, list):
-            raise TypeError("Se esperaba una lista de claves.")
-        
-        self._data = data  # Lista de claves del diccionario
-        self._index = 0  # Índice actual en la iteración
-        self._hash_cache = hash_cache  # Hash inicial del diccionario
-
-    def next(self, current: Optional[Ice.Current] = None) -> str:
-        """
-        Devuelve la siguiente clave en el iterador.
-        :raises StopIteration: Si se alcanza el final de la iteración.
-        :raises CancelIteration: Si el objeto iterado fue modificado.
-        """
-        # Verificar si el objeto iterado fue modificado
-        if self._hash_cache != hash(frozenset(self._data)):
+        # Verificar si el diccionario fue modificado
+        current_hash = self._remote_dict.hash()
+        if self._hash_cache != current_hash:
             raise rt.CancelIteration()
 
-        # Verificar si ya no hay más claves en la lista
-        if self._index >= len(self._data):
+        if self._index >= len(self._keys):
             raise rt.StopIteration()
 
-        # Devolver la clave actual y avanzar el índice
-        key = self._data[self._index]
+        key = self._keys[self._index]
         self._index += 1
         return key
 
 
+class IterableRSet(rt.Iterable):
+    def __init__(self, remote_set):
+        """
+        Inicializa el iterador del conjunto remoto.
+        :param remote_set: Referencia al objeto RemoteSet original.
+        """
+        self._remote_set = remote_set  # Referencia al RemoteSet original
+        self._hash_cache = remote_set.hash()  # Hash inicial del conjunto
+        self._items = list(remote_set._storage_)  # Capturar los elementos actuales del conjunto
+        self._index = 0  # Índice para iterar sobre los elementos
 
+    def next(self, current=None):
+        """
+        Obtiene el siguiente elemento del iterador.
+        Lanza StopIteration si no hay más elementos.
+        Lanza CancelIteration si el conjunto fue modificado.
+        """
+        # Verificar si el conjunto fue modificado
+        current_hash = self._remote_set.hash()
+        if self._hash_cache != current_hash:
+            raise rt.CancelIteration()
 
+        if self._index >= len(self._items):
+            raise rt.StopIteration()
 
+        item = self._items[self._index]
+        self._index += 1
+        return item
 

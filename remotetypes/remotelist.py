@@ -20,14 +20,10 @@ class RemoteList(rt.RList):
         self._data = []  # Datos de la lista
         self._hash_cache = None  # Caché para el hash de la lista
 
-    def iter(self, current: Optional[Ice.Current] = None) -> rt.Iterable:
+    def iter(self, current: Optional[Ice.Current] = None) -> rt.IterablePrx:
         """Return a proxy to an iterator for the list."""
-        # Verificar si la lista está vacía
-        if not self._data:
-            raise rt.StopIteration("La lista está vacía, no se puede iterar.")
-
         # Crear un iterador basado en la lista actual
-        iterator = IterableRList(self._data, hash(tuple(self._data)))
+        iterator = IterableRList(self)
 
         # Obtener el adaptador del servidor desde el contexto actual
         adapter = current.adapter
@@ -45,10 +41,11 @@ class RemoteList(rt.RList):
         print(f"Iterador creado para la lista con {len(self._data)} elementos.")
         return iterable_proxy
 
+
     def remove(self, value: str, current: Optional[Ice.Current] = None) -> None:
         """Remove an element by value."""
         if value not in self._data:
-            raise KeyError(f"Value '{value}' not found.")
+            raise rt.KeyError(f"Value '{value}' not found.")
         self._data.remove(value)
         self._hash_cache = None  # Reset hash cache
         print(f"Removed value: {value}")
@@ -81,10 +78,10 @@ class RemoteList(rt.RList):
             index = -1
 
         if not self._data:
-            raise IndexError("Cannot pop from an empty list.")
+            raise rt.IndexError("Cannot pop from an empty list.")
 
         if index >= len(self._data):
-            raise IndexError(f"Index '{index}' out of range.")
+            raise rt.IndexError(f"Index '{index}' out of range.")
 
         value = self._data.pop(index)
         self._hash_cache = None  # Reset hash cache
@@ -94,7 +91,7 @@ class RemoteList(rt.RList):
     def getItem(self, index: int, current: Optional[Ice.Current] = None) -> str:
         """Return the element at the given position."""
         if index < 0 or index >= len(self._data):
-            raise IndexError(f"Index '{index}' out of range.")
+            raise rt.IndexError(f"Index '{index}' out of range.")
         value = self._data[index]
         print(f"Retrieved item at index {index}: {value}")
         return value
