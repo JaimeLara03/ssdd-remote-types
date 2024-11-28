@@ -56,44 +56,40 @@ class IterableRList(rt.Iterable):
 class IterableRDict(rt.Iterable):
     """Iterador para RemoteDict."""
 
-    def __init__(self, data: dict, hash_cache: int):
+    def __init__(self, data: list, hash_cache: int):
         """
         Inicializar el iterador del diccionario remoto.
-        :param data: Diccionario de pares clave-valor o lista de pares clave-valor.
+        :param data: Lista de claves del diccionario.
         :param hash_cache: Caché de hash inicial para detectar modificaciones.
         """
-        if isinstance(data, dict):
-            self._data = data # Convierte el diccionario a una lista de pares clave-valor
-        elif isinstance(data, list):
-            self._data = list(data.items())  # Asume que ya es una lista de pares clave-valor
-        else:
-            raise TypeError("El parámetro 'data' debe ser un diccionario o una lista de pares clave-valor.")
-
+        if not isinstance(data, list):
+            raise TypeError("Se esperaba una lista de claves.")
+        
+        self._data = data  # Lista de claves del diccionario
         self._index = 0  # Índice actual en la iteración
         self._hash_cache = hash_cache  # Hash inicial del diccionario
 
-    def next(self, current: Optional[Ice.Current] = None) -> tuple:
+    def next(self, current: Optional[Ice.Current] = None) -> str:
         """
-        Obtiene el siguiente par clave-valor en el iterador.
+        Devuelve la siguiente clave en el iterador.
         :raises StopIteration: Si se alcanza el final de la iteración.
         :raises CancelIteration: Si el objeto iterado fue modificado.
         """
         # Verificar si el objeto iterado fue modificado
-        if self._hash_cache != hash(frozenset(self._data.items())):
-            raise rt.CancelIteration("El diccionario fue modificado.")
+        if self._hash_cache != hash(frozenset(self._data)):
+            raise rt.CancelIteration()
 
-        # Verificar si ya no hay más elementos en el diccionario
+        # Verificar si ya no hay más claves en la lista
         if self._index >= len(self._data):
-            raise rt.StopIteration("No hay más elementos para iterar.")
+            raise rt.StopIteration()
 
-        # Obtener las claves del diccionario como una lista ordenada
-        keys = list(self._data.keys())
-
-        # Devolver el par clave-valor actual y avanzar el índice
-        current_key = keys[self._index]
-        current_value = self._data[current_key]
+        # Devolver la clave actual y avanzar el índice
+        key = self._data[self._index]
         self._index += 1
-        return current_key, current_value
+        return key
+
+
+
 
 
 

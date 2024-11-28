@@ -63,11 +63,11 @@ class RemoteDict(rt.RDict):
         Devuelve un proxy para un iterador del diccionario.
         """
         if not self._data:
-            raise rt.StopIteration("El diccionario está vacío, no se puede iterar.")
+            raise rt.StopIteration()
 
-        # Crear un iterador basado en los pares clave-valor del diccionario
+        # Crear un iterador basado en las claves del diccionario
         hash_cache = hash(frozenset(self._data.items()))
-        iterable = IterableRDict(self._data, hash_cache)
+        iterable = IterableRDict(list(self._data.keys()), hash_cache)
 
         # Obtener el adaptador del servidor desde el contexto actual
         adapter = current.adapter
@@ -82,7 +82,7 @@ class RemoteDict(rt.RDict):
         if not iterable_proxy:
             raise RuntimeError("No se pudo crear un proxy válido para el iterador.")
 
-        print(f"Iterador creado para el diccionario con {len(self._data)} elementos.")
+        print(f"Iterador creado para el diccionario con {len(self._data)} claves.")
         return iterable_proxy
 
 

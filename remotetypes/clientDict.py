@@ -44,18 +44,13 @@ class Client(Ice.Application):
 
             # 8. iter
             print("Iterando sobre el diccionario remoto.")
-            iterator = rdict.iter()  # Obtén el iterador remoto
-
+            iterator = rdict.iter()
             while True:
                 try:
-                    # Llama a next() para obtener el siguiente par clave-valor
-                    key, value = iterator.next()
-                    print(f"Clave: {key}, Valor: {value}")
-                except StopIteration:
+                    key = iterator.next()
+                    print(f"Clave: {key}")
+                except rt.StopIteration:
                     print("Iteración completada (final del diccionario alcanzado).")
-                    break  # Salir del bucle al final de la iteración
-                except CancelIteration:
-                    print("Iteración cancelada debido a modificaciones en el diccionario.")
                     break
         except Exception as e:
             print(f"Error inesperado durante la iteración: {e}")
