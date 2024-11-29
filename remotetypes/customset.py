@@ -1,6 +1,6 @@
 """Implementation of custom sets."""
 
-from typing import Optional
+from typing import Any, Iterable, Optional
 
 
 class StringSet(set):
@@ -8,9 +8,9 @@ class StringSet(set):
 
     def __init__(
         self,
-        *args: tuple[object],
-        force_upper_case: Optional[bool] = False,
-        **kwargs: dict[str, object],
+        iterable: Optional[Iterable[str]] = None,
+        *,
+        force_upper_case: bool = False,
     ) -> None:
         """Build an unordered collection of unique elements of type str.
 
@@ -18,12 +18,16 @@ class StringSet(set):
         StringSet(iterable) -> new StringSet object
         """
         self.upper_case = force_upper_case
-        super().__init__(*args, **kwargs)
+        if iterable is not None:
+            for item in iterable:
+                self.add(item)
+        else:
+            super().__init__()
 
     def add(self, item: str) -> None:
         """Add an element to a set. Checks the element type to be a str."""
         if not isinstance(item, str):
-            raise ValueError(item)
+            raise ValueError(f"Only strings are allowed. Invalid item: {item}")
 
         if self.upper_case:
             item = item.upper()

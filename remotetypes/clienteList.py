@@ -84,7 +84,7 @@ class RListClient(Ice.Application):
 
             # 2.10.1 y 2.10.2 RList.pop devuelve y elimina el elemento indicado
             print("Haciendo pop en posición 1.")
-            elemento_popped = rlist.pop(1)
+            elemento_popped = rlist.pop(-4)
             print(f"Elemento obtenido: {elemento_popped}")
             length_post_pop = rlist.length()
             print(f"Longitud de la lista después de pop: {length_post_pop}")
