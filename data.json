@@ -1,1 +1,1 @@
-{"RDict": {"miDiccionario": {"clave1": "valor1", "clave4": "valor4"}}, "RList": {"miLista": ["elemento1", "elemento2", "elemento3"]}, "RSet": {"miConjunto": []}}
+{"RDict": {"miDiccionario": {"clave1": "valor1", "clave4": "valor4"}}, "RList": {"miLista": []}, "RSet": {"miConjunto": ["elemento2", "elemento3", "elemento1"]}}

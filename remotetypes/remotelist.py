@@ -80,7 +80,7 @@ class RemoteList(rt.RList):
         if not self._data:
             raise rt.IndexError("Cannot pop from an empty list.")
 
-        if index >= len(self._data):
+        if index >= len(self._data) or index < -len(self._data):
             raise rt.IndexError(f"Index '{index}' out of range.")
 
         value = self._data.pop(index)

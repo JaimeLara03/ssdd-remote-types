@@ -1,3 +1,5 @@
+"""Módulo que contiene el cliente para probar RDict, RList y RSet."""
+
 import sys
 import logging
 from typing import List
@@ -72,6 +74,7 @@ class Client(Ice.Application):
             try:
                 print("Intentando obtener valor de clave_inexistente.")
                 valor_inexistente = rdict.getItem("clave_inexistente")
+                print(valor_inexistente)
             except rt.KeyError:
                 print("Se lanzó KeyError al intentar obtener una clave que no existe.")
 
@@ -210,7 +213,7 @@ class Client(Ice.Application):
             print("Intentando obtener elemento en posición inválida.")
             try:
                 rlist.getItem(10)
-            except rt.IndexError as e:
+            except rt.IndexError:
                 print(f"Se lanzó IndexError al intentar obtener una posición inválida.")
 
             # 2.6 RList.hash devuelve enteros iguales
@@ -236,7 +239,7 @@ class Client(Ice.Application):
             print("Intentando hacer pop en posición inválida.")
             try:
                 rlist.pop(10)
-            except rt.IndexError as e:
+            except rt.IndexError:
                 print("Se lanzó IndexError al intentar hacer pop en una posición inválida.")
 
             # 2.9.1 y 2.9.2 RList.pop devuelve y elimina el elemento del final

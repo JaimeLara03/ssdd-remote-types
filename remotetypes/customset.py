@@ -1,6 +1,6 @@
 """Implementation of custom sets."""
 
-from typing import Any, Iterable, Optional
+from typing import Iterable, Optional
 
 
 class StringSet(set):
