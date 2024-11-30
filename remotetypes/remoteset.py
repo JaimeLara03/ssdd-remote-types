@@ -4,6 +4,8 @@ from typing import Optional
 
 import Ice
 import RemoteTypes as rt  # noqa: F401; pylint: disable=import-error
+import logging
+
 
 from remotetypes.customset import StringSet
 from remotetypes.iterable import IterableRSet
@@ -13,6 +15,7 @@ class RemoteSet(rt.RSet):
 
     def __init__(self, identifier) -> None:
         """Initialise a RemoteSet with an empty StringSet."""
+        self.logger = logging.getLogger(__name__)
         self._storage_ = StringSet()
         self.id_ = identifier
 
@@ -58,7 +61,7 @@ class RemoteSet(rt.RSet):
         if not iterable_proxy:
             raise RuntimeError("No se pudo crear un proxy válido para el iterador.")
 
-        print(f"Iterador creado para el conjunto con {len(self._storage_)} elementos.")
+        self.logger.info(f"Iterador creado para el conjunto con {len(self._storage_)} elementos.")
         return iterable_proxy
 
     def add(self, item: str, current: Optional[Ice.Current] = None) -> None:

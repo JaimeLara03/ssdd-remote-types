@@ -1,4 +1,5 @@
 """Módulo que contiene el cliente para probar RDict, RList y RSet."""
+"""Clase conjunta con Jose Moran Galan para comprobar el funcionamiento del servidor con el mismo cliente"""
 
 import sys
 import logging
@@ -161,7 +162,6 @@ class Client(Ice.Application):
             print(f"Error durante las operaciones: {e}")
             return -1
 
-
         print("\nLista \n.")
         
         # Obtener un RList remoto desde la fábrica
@@ -214,7 +214,7 @@ class Client(Ice.Application):
             try:
                 rlist.getItem(10)
             except rt.IndexError:
-                print(f"Se lanzó IndexError al intentar obtener una posición inválida.")
+                print("Se lanzó IndexError al intentar obtener una posición inválida.")
 
             # 2.6 RList.hash devuelve enteros iguales
             hash1 = rlist.hash()
@@ -286,10 +286,8 @@ class Client(Ice.Application):
             print(f"Error durante las operaciones: {e}")
             return -1
         
-        
-    
         print("\nSET \n.")
-
+        
         remote_set = factory.get(rt.TypeName.RSet, "miConjunto")
         rset = rt.RSetPrx.checkedCast(remote_set)
 
@@ -363,8 +361,7 @@ class Client(Ice.Application):
         
         print("Todas las operaciones completadas exitosamente.")
         return 0
-
-
+    
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     client = Client()

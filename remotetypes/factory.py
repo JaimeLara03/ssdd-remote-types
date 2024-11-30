@@ -16,6 +16,7 @@ class Factory(rt.Factory):
 
     def __init__(self, adapter: Ice.ObjectAdapter) -> None:
         """Inicializa el objeto Factory."""
+        self.logger = logging.getLogger(__name__)
         self.adapter = adapter  # Adaptador para publicar objetos
         self.instances: Dict[str, Ice.Object] = {}  # Almacenar instancias registradas
         self.load_data()  # Cargar datos al iniciar
@@ -44,9 +45,9 @@ class Factory(rt.Factory):
                     instance._storage_._data = set(obj_data)
                     self.instances[identifier] = instance
                     self.adapter.add(instance, Ice.Identity(name=identifier, category=""))
-            print("Datos cargados desde data.json")
+            self.logger.info("Datos cargados desde data.json")
         else:
-            print("No se encontró data.json, iniciando con datos vacíos")
+            self.logger.info("No se encontró data.json, iniciando con datos vacíos")
 
     def save_data(self):
         """Guarda los datos de las estructuras remotas en un archivo JSON."""
@@ -60,7 +61,7 @@ class Factory(rt.Factory):
                 data['RSet'][identifier] = list(instance._storage_)
         with open('data.json', 'w') as f:
             json.dump(data, f)
-        print("Datos guardados en data.json")
+        self.logger.info("Datos guardados en data.json")
 
     def get(self, typeName: rt.TypeName, identifier: Optional[str] = None, current: Optional[Ice.Current] = None) -> rt.RType:
         """Obtiene un objeto remoto según el tipo solicitado."""
