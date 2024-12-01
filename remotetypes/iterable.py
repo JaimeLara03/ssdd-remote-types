@@ -52,10 +52,10 @@ class IterableRList(rt.Iterable):
     
 class IterableRDict(rt.Iterable):
     def __init__(self, remote_dict):
-        self._remote_dict = remote_dict  # Referencia al RemoteDict original
-        self._hash_cache = remote_dict.hash()  # Hash inicial del diccionario
-        self._keys = list(remote_dict._data.keys())  # Capturar las claves actuales del diccionario
-        self._index = 0  # Índice para iterar sobre las claves
+        self._remote_dict = remote_dict  
+        self._hash_cache = remote_dict.hash()  
+        self._keys = list(remote_dict._data.keys())  
+        self._index = 0  
 
     def next(self, current: Optional[Ice.Current] = None):
         # Verificar si el diccionario fue modificado
@@ -73,11 +73,11 @@ class IterableRDict(rt.Iterable):
 
 class IterableRSet(rt.Iterable):
     def __init__(self, remote_set):
-        self._remote_set = remote_set  # Referencia al RemoteSet original
-        self._hash_cache = remote_set.hash()  # Hash inicial del conjunto
-        self._items = list(remote_set._storage_)  # Capturar los elementos actuales del conjunto
-        self._index = 0  # Índice para iterar sobre los elementos
-
+        self._remote_set = remote_set  
+        self._hash_cache = remote_set.hash() 
+        self._items = list(remote_set._storage_)  
+        self._index = 0  
+        
     def next(self, current=None):
         # Verificar si el conjunto fue modificado
         current_hash = self._remote_set.hash()

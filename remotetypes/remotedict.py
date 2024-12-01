@@ -1,6 +1,7 @@
 import RemoteTypes as rt
 from typing import Optional
 import Ice
+import logging
 
 from remotetypes.iterable import IterableRDict  # Importa la clase personalizada Iterable
 
@@ -10,6 +11,7 @@ class RemoteDict(rt.RDict):
     def __init__(self, identifier: str):
         """Inicializa el diccionario remoto con un identificador único."""
         super().__init__()
+        self.logger = logging.getLogger(__name__)
         self._identifier = identifier
         self._data = {}  # Diccionario interno para almacenar los datos
 
@@ -70,7 +72,7 @@ class RemoteDict(rt.RDict):
         if not iterable_proxy:
             raise RuntimeError("No se pudo crear un proxy válido para el iterador.")
 
-        print(f"Iterador creado para el diccionario con {len(self._data)} elementos.")
+        self.logger.info(f"Iterador creado para el diccionario con {len(self._data)} elementos.")
         return iterable_proxy
 
 

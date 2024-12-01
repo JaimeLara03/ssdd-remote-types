@@ -1,13 +1,14 @@
 """Módulo que contiene el cliente para probar RDict, RList y RSet."""
-"""Clase conjunta con Jose Moran Galan para comprobar el funcionamiento del servidor con el mismo cliente"""
-
+import time
 import sys
 import logging
 from typing import List
 import Ice
 import RemoteTypes as rt
 
-
+#Recibir el proxy para Jaime Lara Contento "factory:default -p 10000"
+#Recibir el proxy para Jose Moran Galan "factory -t -e 1.1:tcp -h 192.168.18.119 -p 43475 -t 60000" aunque la Ip daría lo mismo 
+# ya que he puesto que pueda ser desde cualquiera
 class Client(Ice.Application):
     def run(self, argv: List[str]) -> int:
         try:
@@ -141,11 +142,12 @@ class Client(Ice.Application):
             try:
                 iterator = rdict.iter()
                 # Modificar el diccionario después de obtener el iterador
-                rdict.setItem("clave4", "valor4")
+                rdict.setItem("clave6", "valor6")
                 while True:
                     try:
                         key = iterator.next()
                         print(f"Clave: {key}")
+                        time.sleep(1)
                     except rt.StopIteration:
                         print("Iteración completada.")
                         break
@@ -161,6 +163,7 @@ class Client(Ice.Application):
         except Exception as e:
             print(f"Error durante las operaciones: {e}")
             return -1
+
 
         print("\nLista \n.")
         
@@ -214,7 +217,7 @@ class Client(Ice.Application):
             try:
                 rlist.getItem(10)
             except rt.IndexError:
-                print("Se lanzó IndexError al intentar obtener una posición inválida.")
+                print(f"Se lanzó IndexError al intentar obtener una posición inválida.")
 
             # 2.6 RList.hash devuelve enteros iguales
             hash1 = rlist.hash()
@@ -270,10 +273,12 @@ class Client(Ice.Application):
             print("Iterando sobre la lista remota:")
             try:
                 iterator = rlist.iter()
+                rlist.append("elemento2")
                 while True:
                     try:
                         item = iterator.next()
                         print(f"Elemento: {item}")
+                        time.sleep(1)
                     except rt.StopIteration:
                         print("Iteración completada.")
                         break
@@ -286,8 +291,10 @@ class Client(Ice.Application):
             print(f"Error durante las operaciones: {e}")
             return -1
         
-        print("\nSET \n.")
         
+    
+        print("\nSET \n.")
+
         remote_set = factory.get(rt.TypeName.RSet, "miConjunto")
         rset = rt.RSetPrx.checkedCast(remote_set)
 
@@ -339,11 +346,13 @@ class Client(Ice.Application):
             try:
                 iterator = rset.iter()
                 # Modificar el conjunto después de obtener el iterador
-                rset.add("elemento3")
+                rset.add("elemento40")
                 while True:
                     try:
+                        #time.sleep(1)
                         item = iterator.next()
                         print(f"Elemento: {item}")
+                        
                     except rt.StopIteration:
                         print("Iteración completada.")
                         break
@@ -361,7 +370,8 @@ class Client(Ice.Application):
         
         print("Todas las operaciones completadas exitosamente.")
         return 0
-    
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     client = Client()

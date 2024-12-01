@@ -3,6 +3,8 @@
 import RemoteTypes as rt 
 from typing import Optional
 import Ice, IcePy
+import logging
+
 
 from remotetypes.iterable import IterableRList  # Importa la clase personalizada Iterable
 
@@ -16,6 +18,7 @@ class RemoteList(rt.RList):
         :param adapter: Ice ObjectAdapter to register iterators.
         """
         super().__init__()
+        self.logger = logging.getLogger(__name__)
         self._identifier = identifier  # Identificador único de la lista
         self._data = []  # Datos de la lista
         self._hash_cache = None  # Caché para el hash de la lista
@@ -38,7 +41,7 @@ class RemoteList(rt.RList):
         if not iterable_proxy:
             raise RuntimeError("No se pudo crear un proxy válido para el iterador.")
 
-        print(f"Iterador creado para la lista con {len(self._data)} elementos.")
+        self.logger.info(f"Iterador creado para la lista con {len(self._data)} elementos.")
         return iterable_proxy
 
 
@@ -48,7 +51,7 @@ class RemoteList(rt.RList):
             raise rt.KeyError(f"Value '{value}' not found.")
         self._data.remove(value)
         self._hash_cache = None  # Reset hash cache
-        print(f"Removed value: {value}")
+        self.logger.info(f"Removed value: {value}")
 
     def length(self, current: Optional[Ice.Current] = None) -> int:
         """Return the length of the list."""
@@ -68,7 +71,7 @@ class RemoteList(rt.RList):
         """Append an element to the end of the list."""
         self._data.append(value)
         self._hash_cache = None  # Reset hash cache
-        print(f"Appended value: {value}")
+        self.logger.info(f"Appended value: {value}")
 
     def pop(self, index=None, current: Optional[Ice.Current] = None) -> str:
         """Remove and return the element at the given position or the last element."""
@@ -85,7 +88,7 @@ class RemoteList(rt.RList):
 
         value = self._data.pop(index)
         self._hash_cache = None  # Reset hash cache
-        print(f"Popped value at index {index}: {value}")
+        self.logger.info(f"Popped value at index {index}: {value}")
         return value
 
     def getItem(self, index: int, current: Optional[Ice.Current] = None) -> str:
@@ -93,7 +96,7 @@ class RemoteList(rt.RList):
         if index < 0 or index >= len(self._data):
             raise rt.IndexError(f"Index '{index}' out of range.")
         value = self._data[index]
-        print(f"Retrieved item at index {index}: {value}")
+        self.logger.info(f"Retrieved item at index {index}: {value}")
         return value
 
     def getIdentifier(self, current: Optional[Ice.Current] = None) -> str:
