@@ -1,32 +1,29 @@
 # remote-types repository template
 
-[![Tests](https://github.com/UCLM-ESI/remote-types/actions/workflows/tests.yml/badge.svg)](https://github.com/UCLM-ESI/remote-types/actions/workflows/tests.yml)
-[![Linters](https://github.com/UCLM-ESI/remote-types/actions/workflows/linters.yml/badge.svg)](https://github.com/UCLM-ESI/remote-types/actions/workflows/linters.yml)
-[![Type checking](https://github.com/UCLM-ESI/remote-types/actions/workflows/typechecking.yml/badge.svg)](https://github.com/UCLM-ESI/remote-types/actions/workflows/typechecking.yml)
+## Este trabajo ha sido realizado por Jaime Lara Contento.
 
-Template for the SSDD laboratory 2024-2025
+Para iniciar el proyecto, es necesario crear el entorno virtual con todas las dependencias instaladas. Para ello, ejecuta el script `EJECUTAME.bash` antes de comenzar. Este script configurará automáticamente el entorno virtual y todas las dependencias necesarias.
+
+
 
 ## Installation
 
 To locally install the package, just run
 
-```
-pip install .
-```
+`pip install .`
+
 
 Or, if you want to modify it during your development,
 
-```
-pip install -e .
-```
+`pip install -e .`
+
 
 ## Execution
 
 To run the template server, just install the package and run
 
-```
-remotetypes --Ice.Config=config/remotetypes.config
-```
+`remotetypes --Ice.Config=config/remotetypes.config`
+
 
 ## Configuration
 
@@ -36,9 +33,8 @@ the file `config/remotetypes.config` and change the existing line.
 For example, if you want to make your server to listen always in the same TCP port, your file
 should look like
 
-```
-remotetypes.Endpoints=tcp -p 10000
-```
+`remotetypes.Endpoints=tcp -p 10000`
+
 
 ## Running tests and linters locally
 
@@ -68,3 +64,5 @@ package is loaded by Python. It makes your life much easier, as you don't need t
 or submodule that you define.
 
 The code loading the Slice is inside the `__init__.py` file.
+
+
