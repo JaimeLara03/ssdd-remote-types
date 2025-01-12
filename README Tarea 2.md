@@ -18,7 +18,7 @@ Las herramientas de línea de comandos de Kafka permiten interactuar con un serv
 Para acceder al contenedor Docker, utiliza:
 
 ```bash
-docker exec -it <nombre_del_contenedor_kafka> /bin/bash
+docker exec -it kafka /bin/bash
 ```
 
 ### Listar topics en un broker de Kafka
@@ -30,13 +30,14 @@ kafka-topics.sh --bootstrap-server localhost:9092 --list
 **Ejemplo de salida:**
 
 ```
-example
+operations
+results
 ```
 
 ### Producir un mensaje
 
 ```bash
-kafka-console-producer.sh --bootstrap-server localhost:9092 --topic example
+kafka-console-producer.sh --bootstrap-server localhost:9092 --topic operations
 ```
 
 Después de ejecutar el comando, escribe tu mensaje y pulsa **Enter**. Para terminar de escribir el mensaje, presiona **Control+D**. Para finalizar la ejecución sin enviar más mensajes, presiona **Control+D** nuevamente.
@@ -44,7 +45,7 @@ Después de ejecutar el comando, escribe tu mensaje y pulsa **Enter**. Para term
 ### Consumir mensajes desde el principio
 
 ```bash
-kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic example --from-beginning
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic operations --from-beginning
 ```
 
 Si se quieren consumir sólo mensajes nuevos, se puede ajustar la opción `--offset` según sea necesario.
@@ -52,7 +53,7 @@ Si se quieren consumir sólo mensajes nuevos, se puede ajustar la opción `--off
 Para imprimir metadatos además de los mensajes, se pueden usar las propiedades `--property`. Por ejemplo, para imprimir el número de partición y offset de cada mensaje:
 
 ```bash
-kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic example --from-beginning --property print.partition=true --property print.offset=true
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic operations --from-beginning --property print.partition=true --property print.offset=true
 ```
 
 Para detener el consumidor, se puede pulsar **Control+C** o usar la opción `--timeout-ms` para que finalice automáticamente después de un período de inactividad.
@@ -66,13 +67,13 @@ Para enviar mensajes de petición de operación, sigue los pasos:
 1. Accede al contenedor de Docker con Kafka:
 
    ```bash
-   docker exec -it <nombre_del_contenedor_kafka> /bin/bash
+   docker exec -it kafka /bin/bash
    ```
 
 2. Usa el siguiente comando para enviar mensajes JSON al topic configurado:
 
    ```bash
-   kafka-console-producer.sh --bootstrap-server localhost:9092 --topic <nombre_del_topic>
+   kafka-console-producer.sh --bootstrap-server localhost:9092 --topic operations
    ```
 
 3. Escribe el mensaje en formato JSON. Ejemplo:
@@ -90,7 +91,7 @@ Para enviar mensajes de petición de operación, sigue los pasos:
 Para verificar las respuestas desde otro topic:
 
 ```bash
-kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic <nombre_del_topic_respuesta> --from-beginning
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic results --from-beginning
 ```
 
 Esto mostrará las respuestas en el siguiente formato JSON:
