@@ -18,6 +18,8 @@ pip install --upgrade pip
 # Instalar las dependencias principales
 echo "Instalando la dependencia principal: zeroc-ice..."
 pip install zeroc-ice
+pip install confluent_kafka
+pip install six
 pip install -e .
 
 # Instalar dependencias adicionales
